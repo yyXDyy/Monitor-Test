@@ -1,0 +1,8 @@
+# DB / Kubeblocks 解析等可选能力（只有启用相关模块时才会用到）。
+kubernetes
+pg8000
+PyMySQL
+redis
+pymongo
+dnspython
+
