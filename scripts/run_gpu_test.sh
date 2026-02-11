@@ -2,8 +2,18 @@
 
 set -euo pipefail
 
+# GPU 测试脚本说明：
+# 1) 启动前置检查：验证 python3、torch 导入、CUDA 可用性与 GPU 列表。
+# 2) 按 quick/full 套件执行 GPU util 与 GPU 显存场景（steady/step/spike 组合）。
+# 3) 每个 case 输出 JSONL 日志（heartbeat/event/error），并在结束后打印摘要统计。
+# 4) 支持 dry-run、跳过前置检查、自定义输出目录与显存回落策略。
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+if [[ -f "${PROJECT_DIR}/.venv/bin/activate" ]]; then
+  source "${PROJECT_DIR}/.venv/bin/activate"
+fi
 
 SUITE="quick"
 DEVICE="${GPU_DEVICE:-0}"
@@ -296,4 +306,3 @@ fi
 
 echo
 echo "[DONE] GPU 测试完成，日志目录: ${OUT_DIR}"
-

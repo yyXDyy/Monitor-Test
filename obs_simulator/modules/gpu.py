@@ -52,7 +52,7 @@ def _gpu_worker(
     def _ensure_mem(target_mb: int) -> None:
         nonlocal allocated_mb, tensors
         target_mb = max(0, int(target_mb))
-        if target_mb <= allocated_mb:
+        if target_mb < allocated_mb:
             if mem_free_policy == "none":
                 return
             if mem_free_policy == "empty_cache":
@@ -156,7 +156,7 @@ class GPUModule:
         else:
             device_labels = [gpu_device]
 
-        ctx = mp.get_context("fork")
+        ctx = mp.get_context("spawn")
         procs: list[_GPUProc] = []
         for d in device_labels:
             parent, child = ctx.Pipe(duplex=True)
@@ -201,7 +201,7 @@ class GPUModule:
                 self._restart_one(i, w.device)
 
     def _restart_one(self, idx: int, device: str) -> None:
-        ctx = mp.get_context("fork")
+        ctx = mp.get_context("spawn")
         parent, child = ctx.Pipe(duplex=True)
         p = ctx.Process(
             target=_gpu_worker,
